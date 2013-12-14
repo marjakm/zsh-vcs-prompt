@@ -287,6 +287,7 @@ function _zsh_vcs_prompt_update_vcs_status() {
     # Parse raw data.
     local raw_data
     raw_data=$(vcs_super_info_raw_data)
+	# echo $raw_data
     if [ -z "$raw_data" ]; then
         ZSH_VCS_PROMPT_VCS_STATUS=
         return

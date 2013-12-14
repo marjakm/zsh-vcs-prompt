@@ -23,13 +23,14 @@ ERRO_MSG_AMBIGUOUS_ARGUMENT = \
 
 
 class Cmd(object):
-    def __init__(self, cmd, exargs=None, ignore_error=False):
+    def __init__(self, cmd, exargs=None, ignore_error=False, shell=False):
         self.ignore_error = ignore_error
+        scmd = cmd
         cmd = shlex.split(cmd)
         if exargs:
             cmd.extend(exargs)
         self.cmd = cmd
-        self.process = Popen(self.cmd, stdout=PIPE, stderr=PIPE)
+        self.process = Popen(self.cmd if not shell else scmd, stdout=PIPE, stderr=PIPE, shell=shell)
 
     def get_result(self):
         out, error = self.process.communicate()
@@ -75,11 +76,11 @@ def main():
     #check_before_running()
 
     # Start proess to get full name of the current branch (like refs/heads/master).
-    p_branch_ref = Cmd('git symbolic-ref HEAD')
+    p_branch_ref = Cmd('git symbolic-ref HEAD 2>/dev/null || git describe --all 2>/dev/null ', shell=True)
     # Start process to get the git top directory.
     p_top_dir = Cmd('git rev-parse --show-toplevel')
     # Start proess to get the current branch name.
-    p_branch = Cmd('git symbolic-ref --short HEAD')
+    p_branch = Cmd('git symbolic-ref --short HEAD || git rev-parse --short HEAD 2>/dev/null', shell=True)
 
     # Get full name of the current barnch (like refs/heads/master).
     try:
